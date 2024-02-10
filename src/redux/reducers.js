@@ -13,7 +13,13 @@ const courseReducer = (
 ) => {
   switch (action.type) {
     case FETCH_COURSES_SUCCESS:
-      return { ...state, courses: action.payload };
+      if (state.courses.length < 1) {
+        return { ...state, courses: action.payload };
+      } else {
+        return {
+          ...state,
+        };
+      }
 
     case FETCH_COURSE_BY_ID_SUCCESS:
       return {
@@ -22,10 +28,19 @@ const courseReducer = (
       };
 
     case ENROLL_COURSE_SUCCESS:
-      return {
-        ...state,
-        enrolled: [...state.enrolled, action.payload],
-      };
+      const isEnrolled = state.enrolled.some(
+        (enrolledCourse) => enrolledCourse.id === action.payload.id
+      );
+      const isCompleted = state.completed.some(
+        (completedCourse) => completedCourse.id === action.payload.id
+      );
+      if (!isEnrolled && !isCompleted) {
+        return {
+          ...state,
+          enrolled: [...state.enrolled, action.payload],
+        };
+      }
+      return state;
 
     case MARK_COURSE_COMPLETED:
       return {
